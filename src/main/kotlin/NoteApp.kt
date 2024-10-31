@@ -2,10 +2,8 @@ import java.util.Scanner
 
 class NoteApp {
     private val scanner = Scanner(System.`in`)
-    private val managerArchive = ManagerArchive()
-    private val managerNote = ManagerNote()
+    private val archives = mutableListOf<Archive>()
     private val menu = Menu(scanner)
-
 
     fun start() {
         mainMenu()
@@ -24,7 +22,7 @@ class NoteApp {
         val name = scanner.nextLine()
 
         if (name.isNotBlank()) {
-            managerArchive.addArchive(name)
+            archives.add(Archive(name))
             println("Архив $name создан")
         } else {
             println("Имя архива не может быть пустым")
@@ -33,27 +31,27 @@ class NoteApp {
     }
 
     private fun viewArchive() {
-        val archives = managerArchive.getArchive()
         if (archives.isEmpty()) {
             println("Нет доступных архивов")
             return
         }
 
         archives.forEachIndexed { index, archive ->
-            println("$index, ${archive.name}")
+            println("$index. ${archive.name}")
         }
-        println("Введите номер архива для просмотра заметок: ")
+
+        println("Введите номер архива для просмотра заметок или ${archives.size} для выхода назад: ")
         val input = scanner.nextLine().toIntOrNull()
         if (input == archives.size) return
 
-        val selectedArchive = managerArchive.getArchive(input ?: -1)
-        if (selectedArchive != null) {
-            viewNotes(selectedArchive)
+        if (input != null && input < archives.size) {
+            viewNotes(archives[input])
         } else {
-            println("Некорректный номер архива.")
+            println("Архива под таким номером нет")
+            return
         }
-
     }
+
 
     private fun createNote(archive: Archive) {
         println("Введите заголовок заметки: ")
@@ -70,7 +68,7 @@ class NoteApp {
             return
         }
 
-        managerNote.addNoteToArchive(archive, title, content)
+        archive.notes.add(Note(title, content))
         println("Заметка $title создана и помещена в архив ${archive.name}")
     }
 
@@ -94,16 +92,17 @@ class NoteApp {
             println("$index. ${note.title}")
         }
 
-        println("Введите номер заметки для просмотра: ")
+        println("Введите номер заметки для просмотра или ${archive.notes.size} для выхода назад: ")
         val input = scanner.nextLine().toIntOrNull()
         if (input == archive.notes.size) return
+
 
         if (input != null && input in archive.notes.indices) {
             val note = archive.notes[input]
             println("Заголовок: ${note.title}")
             println("Содержание: ${note.content}")
         } else {
-            println("Некорректный номер заметки.")
+            println("Некорректный номер заметки")
         }
     }
 

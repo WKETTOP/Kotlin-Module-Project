@@ -8,7 +8,8 @@ class Menu(private val scanner: Scanner) {
             options.forEachIndexed { index, option ->
                 println("${index}. ${option.first}")
             }
-            if (isFirstScreen == true) {
+
+            if (isFirstScreen) {
                 println("${options.size}. Выход")
             } else {
                 println("${options.size}. Назад")
@@ -17,11 +18,12 @@ class Menu(private val scanner: Scanner) {
 
             val enter = scanner.nextLine().toIntOrNull()
             if (isFirstScreen && enter == options.size) {
-                println("Выход из программы.")
+                println("Выход из программы")
                 break
             } else if (!isFirstScreen && enter == options.size) {
                 return
             }
+
             if (enter != null && enter in options.indices) {
                 options[enter].second.invoke()
             } else {
